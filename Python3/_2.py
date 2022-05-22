@@ -10,9 +10,7 @@ class Solution(object):
         pointer = result
         
         while (l1 or l2):
-            n1 = l1.val if l1 else 0
-            n2 = l2.val if l2 else 0
-            sum = carry + n1 + n2
+            sum = carry + (l1.val if l1 else 0) + (l2.val if l2 else 0)
             sum_digit = sum % 10
             carry = sum // 10
             
