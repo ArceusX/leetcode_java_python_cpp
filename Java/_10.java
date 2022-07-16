@@ -1,30 +1,30 @@
 class Solution {
-    public boolean isMatch(String s, String p) {
+    public boolean isMatch(String t, String p) {
 
-        int sizeS = s.length();
+        int sizeT = t.length();
         int sizeP = p.length();
 
-        boolean[][] arr = new boolean[sizeS + 1][sizeP + 1];
+        boolean[][] arr = new boolean[sizeP + 1][sizeT + 1];
 
         arr[0][0] = true;
-        for (int i = 2; i < sizeP + 1; i++) {
-            if (p.charAt(i - 1) == '*') {
-                arr[0][i] = arr[0][i - 2];
+        for (int j = 2; j < sizeP + 1; j++) {
+            if (p.charAt(j - 1) == '*') {
+                arr[j][0] = arr[j - 2][0];
             }
         }
-        
-        for (int i = 1; i < sizeS + 1; i++) {
-            for (int j = 1; j < sizeP + 1; j++) {
-                if (s.charAt(i - 1) == p.charAt(j - 1) || p.charAt(j - 1) == '.') {
-                    arr[i][j] = arr[i - 1][j - 1];
-                } else if (j > 1 && p.charAt(j - 1) == '*') {
-                    arr[i][j] = arr[i][j - 2];
-                    if (p.charAt(j - 2) == '.' || p.charAt(j - 2) == s.charAt(i - 1)) {
-                        arr[i][j] = arr[i][j] | arr[i - 1][j];
+
+        for (int j = 1; j < sizeP + 1; j++)
+            for (int i = 1; i < sizeT + 1; i++) { {
+                if (t.charAt(i - 1) == p.charAt(j - 1) || p.charAt(j - 1) == '.') {
+                    arr[j][i] = arr[j - 1][i - 1];
+                } else if (p.charAt(j - 1) == '*') {
+                    arr[j][i] = arr[j - 2][i];
+                    if (p.charAt(j - 2) == '.' || p.charAt(j - 2) == t.charAt(i - 1)) {
+                        arr[j][i]  = arr[j][i] || arr[j][i - 1];
                     }
                 }
             }
         }
-        return arr[sizeS][sizeP];
+        return arr[sizeP][sizeT];
     }
 }

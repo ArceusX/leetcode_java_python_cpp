@@ -1,64 +1,73 @@
 """
-Complexity
-Time      : O(m x n) for s of size m, p of size n,
+Problem :
+. = matches any single char
+* = matches zero or more of (guaranteed existing) preceding char
 
-            We iterate over each char of pattern p 
-            and check if it matches each char of s.
-            Thus, loop of range m nested in loop of range n
+Text and pattern must match exactly.
 
-Space     : O(m x n)
+Algo    : Calculate result as result of earlier checks (memoized in
+          table) and current chars check. Return highest-indices
+          entry of table as result over full text and full pattern.
 
-            We keep array indexing each char of
-            s of size m and each of p of size n,
+Complex.
+Time    : O(lenT * lenP) for text T, pattern p
+
+          Iterate over each char of pattern p and check if it matches
+          each char of t. Outer loop of lenP, inner loop of lenT
+
+Space   : O(m * n)
+
+          We keep array indexing result matching each char 
+          of t of size m and each of p of size n.
 """
 
 class Solution:
-    def isMatch(self, s: str, p: str) -> bool:
+    def isMatch(self, t: str, p: str) -> bool:
         
-        sizeS, sizeP = (len(s), len(p))
+        lenT, lenP = (len(t), len(p))
         
-        # Add 1 more row and 1 more col because we need to have
-        # other checks reference check of s of empty str and
-        # p of empty str, which must give result True
-        arr = [[False for j in range(sizeP + 1)] for i in range(sizeS + 1)]
+        # Add 1 more row and 1 more col because other checks
+        # need to be able to reference check of t of empty str
+        # and p of empty str, which must give result True.
+        arr = [[False for iT in range(lenT + 1)] for iP in range(lenP + 1)]
         arr[0][0] = True;
 
-        # *, always preceded by alphanumeric, can match none
-        # of preceding alphanumeric, thus allowing * and
-        # that alphanumeric to be ignored (e.g. [i - 2] -> i)
-        # IE, if p = "" matches s = "", "a*" also matches ""
-        # arr[0][0] = True lets us match "" with "_*"
+        # *, guaranteed preceded by alphanumeric, permits zero match
+        # of alphanumeric, allowing * and preceeding alphanumeric
+        # to be ignored (e.g. result of [iP - 2] -> result of [iP])
+        # IE, if p = "" matches t = "", "a*" also matches ""
+        # arr[0][0] = True lets us match "" with p: "_*", "_*_*", etc
 
-        for j in range(2, sizeP + 1):
-            if p[j - 1] == '*':
-                arr[0][j] = arr[0][j - 2]
+        for iP in range(2, lenP + 1):
+            if p[iP - 1] == '*':
+                arr[iP][0] = arr[iP - 2][0]
 
-        for i in range(1, sizeS + 1):
-            for j in range(1, sizeP + 1):
-
+        for iP in range(1, lenP + 1):    
+            for iT in range(1, lenT + 1):
                 # . is wildcard (matches any 1)
-                # s[i - 1] == p[j - 1]: edges for strings line up
-                # = arr[i - 1][j - 1], result of check equals 
+                # p[iP - 1] == t[iT - 1]: edges for strings line up
+                # = arr[iP - 1][iT - 1], result of check equals 
                 # result of check with previous edges
-                if p[j - 1] == '.' or p[j - 1] == s[i - 1]:
-                    arr[i][j] = arr[i - 1][j - 1]
+                if p[iP - 1] == '.' or p[iP - 1] == t[iT - 1]:
+                    arr[iP][iT] = arr[iP - 1][iT - 1]
 
-                #Unnecessary to check j > 1, because * is guaranteed
-                #to have precursor (* guaranteed to not ever be 0th char)
-                elif p[j - 1] == '*':
+                # Unnecessary to check iP > 1, because prcecusor
+                # guaranteed for * (* guaranteed to not be 0th char)
+                elif p[iP - 1] == '*':
 
-                    # After * as p[j-1], check p[j-2], for any . before *
-                    # Or if preceding x in 'x*' matches an 'x' in s
-                    # If either True, indicate x in s matches x in p.
-                    # Slide edge in s left 1 to check for more matches
-                    # of x in s (property of *)
-                    if p[j - 2] == '.' or p[j - 2] == s[i - 1]:
-                        arr[i][j] = arr[i - 1][j]
+                    # From * as p[iP-1], check p[iP-2], for any . before *
+                    # Or if preceding x in 'x*' matches an 'x' in t
+                    # If either True, indicate . or x in t matches x in p.
+                    # Slide edge of t left 1 to check for more matches
+                    # of x in t (property of *). Edge of p remains at x.
+                    if p[iP - 2] == '.' or p[iP - 2] == t[iT - 1]:
+                        arr[iP][iT] = arr[iP][iT - 1]
 
-                    # * permits none match, so borrow result corresponding
-                    # to char preceding "_*", even if no
-                    # such p[j-2]
-                    arr[i][j] = arr[i][j] or arr[i][j - 2]
+                    # Either there's match (above if), so we use that, 
+                    # or permitted no match, so borrow result of char 
+                    # preceding "_*". arr[iP-2][iT] exists because we created 
+                    # column for t of "".
+                    arr[iP][iT] = arr[iP][iT] or arr[iP - 2][iT]
 
-        return arr[sizeS][sizeP]
+        return arr[lenP][lenT]
 
