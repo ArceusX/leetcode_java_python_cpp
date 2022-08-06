@@ -1,39 +1,31 @@
 """
-Algo:For each char, calculate longest substring that can be
-    constructed from it and all other chars preceeding it, 
-    excluding previous copy of same char, if one exists, 
-    and other chars preceding that previous copy. Compare
-    these individual longest substrings to get absolute longest.
+For previously unseen char, store its index in dict,
+    calculate length from "start" to it, and get higher
+    between that length and maxLen. If recounter char,
+    move start to index after previous index of duplicate
+    [if] that previous index follows current start.
+    Exclude from sequence last previous copy of duplicate
+    char and any char preceding that previous copy.
+    For each char, eval longest sequence containing it
 
-
-Compare flow of strings "abcdba" vs "abcdbd"
-    For abcdba, when 2nd b is encountered, var start is set to index of
-    c, char proceeding b, which is encountered a 2nd time in
-    current scanned substring. Thus, for 2nd b, longest substring
-    that can be constructed with that 2nd b excludes precious b copy 
-    and chars preceeding the preceding b.
-
-    Continuing onto 2nd a, start already set to index of c,
-    start = Math.max(start, chars.get(c) + 1) excludes all those
-    already excluded chars, even if some of them follows first a.
-
-    For char immediately following 2nd b: a vs d
-    abcdba: start > chars.get(c) + 1. Chars considered: ab[cd]ba
-    abcdbd: start < chars.get(c) + 1. Chars considered abcd[bd]"""
+[a+b+c+d+e]         -> Eval [abcd(e)]
+[a+b+c+d+e] + c     -> Eval [de(c)]
+[a+b+c+d+e] + c + b -> Eval [dec(b)]
+"""
 
 class Solution:
 
     def lengthOfLongestSubstring(self, s: str) -> int:
         chars = {}
+        maxLen = 0
         start = 0
-        max_length = 0
             
-        for index, c in enumerate(s):
+        for end, c in enumerate(s):
             if c in chars:
-                start = max(start, chars[c] + 1)
-                
-            max_length = max(max_length, index - start + 1)
-            chars[c] = index
+                start = max(chars[c] + 1, start)
+
+            chars[c] = end
+            maxLen = max(maxLen, end - start + 1)
             
-        return max_length
+        return maxLen
         

@@ -1,28 +1,17 @@
-/* Standard std library functions included
-   so unnecessary to include <include algorithm>
-   or using namespace std; */
-
 class Solution {
 public:
     int maxArea(vector<int>& height) {
-
-        int max_width = height.size();
         
-        int left = 0;
-        int right = max_width - 1;
-        int max_area = 0;
+        int maxArea = 0;
+        int L = 0, R = height.size() - 1;
         
-        while (left < right) {
-            int shorter_height = (height[left] < height[right]) ? height[left] : height[right];
-            max_area = max(max_area, shorter_height * (right - left));
+        while (L < R) {
+            int shorter = (height[L] < height[R]) ? height[L] : height[R];
+            maxArea = max(maxArea, shorter * (R - L));
             
-            if (height[left] < height[right]) {
-                left++;
-            }
-            else {
-                right--;
-            }
+            if (height[L] < height[R]) L++;
+            else R--;
         }
-        return max_area;
+        return maxArea;
     }
 };

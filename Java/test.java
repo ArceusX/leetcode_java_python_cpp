@@ -26,14 +26,15 @@ class Solution {
         }
 
         StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (; i < product.length; i++) {
+        for (int i = 0; i < product.length; i++) {
             // Write product [] to sb left to right
-            // Ignore (leading) zeroes ie (009 -> 9)
-            if (product[i] != 0) break;
+            // Ignore (leading) zeroes with no non-zero to their left
+            // 009 -> 9. Simply checking char to left suffices
+            if (sb.length() == 0 && product[i] == 0) {
+                continue;
+            }
+            sb.append(product[i]);
         }
-
-        for (; i < product.length; i++) sb.append(product[i]);
         return sb.toString();
     }
 }

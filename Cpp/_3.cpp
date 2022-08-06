@@ -4,21 +4,21 @@
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
+        unordered_map<char, int> chars;
         int max_length = 0;
         int start = 0;
-        unordered_map<char, int> chars;
         
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.at(i);
+        for (int end = 0; end < s.length(); end++) {
+            char c = s.[end];
 
             auto prev = chars.find(c);
             if (prev != chars.end()) {
-                start = std::max(start, prev->second + 1);
+                start = std::max(prev->second + 1, start);
             }
             
-            max_length = max(max_length, i - start + 1);
+            max_length = max(max_length, end - start + 1);
 
-            chars[c] = i;
+            chars[c] = end;
         }
         
         return max_length;

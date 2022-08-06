@@ -1,4 +1,3 @@
-# Definition for singly-linked list.
 # class ListNode(object):
 #     def __init__(self, val=0, next=None):
 #         self.val = val
@@ -6,21 +5,23 @@
 class Solution(object):
     def addTwoNumbers(self, l1, l2):
         carry = 0
-        result = ListNode(0)
+
+        # False head: we'll be actually returning result.next
+        result = ListNode(-1)
         pointer = result
         
         while (l1 or l2):
             sum = carry + (l1.val if l1 else 0) + (l2.val if l2 else 0)
-            sum_digit = sum % 10
             carry = sum // 10
-            
-            pointer.next = ListNode(sum_digit)
+
+            # Add next node of ones digit. Then move to it
+            pointer.next = ListNode(sum % 10)
             pointer = pointer.next
             
-            l1 = l1.next if l1 else None
-            l2 = l2.next if l2 else None
+            if l1: l1 = l1.next
+            if l2: l2 = l2.next
             
-        if (carry != 0):
+        if (carry):
             pointer.next = ListNode(carry)
             
         return result.next

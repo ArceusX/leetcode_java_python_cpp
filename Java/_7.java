@@ -1,18 +1,13 @@
 class Solution {
-    public int reverse(int x) {
-        boolean isNegative = false;
-        if (x < 0) {
-            isNegative = true;
-            x = -x;
-        }
-        long reverse = 0;
-        while (x > 0) {
-            reverse = reverse * 10 + x % 10;
+    public int reverseerse(int x) {
+        int reverse = 0;
+        while (x != 0) {
+            int leastSig = x % 10;
+            if (reverse > Integer.MAX_VALUE/10 || (reverse == Integer.MAX_VALUE / 10 && leastSig > 7)) return 0;
+            if (reverse < Integer.MIN_VALUE/10 || (reverse == Integer.MIN_VALUE / 10 && leastSig < -8)) return 0;
+            reverse = reverse * 10 + leastSig;
             x /= 10;
         }
-        if (reverse > Integer.MAX_VALUE) {
-            return 0;
-        }
-        return (int) (isNegative ? -reverse : reverse);
+        return reverse;
     }
 }

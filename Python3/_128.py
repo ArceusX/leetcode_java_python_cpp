@@ -1,23 +1,24 @@
+#Quickest pproach with O(n) time uses hashset
+
 class Solution:
     def longestConsecutive(self, nums: List[int]) -> int:
-        _set = set(nums)
-        _maxLen = 0
-        for num in nums:
-            _len = 1;
-            _lower = num - 1;
+        
+        #Convert to set for quick O(1) hashed lookup
+        numSet = set(nums)
+        longest = 0
+        for num in numSet:
             
-            while (_lower in _set):
-                _set.remove(_lower)
-                _lower -= 1
-                _len += 1
-                
-            num += 1
-            while (num in _set):
-                _set.remove(num)
-                num += 1
-                _len += 1
-                
-            _maxLen = max(_maxLen, _len)
-            
-        return _maxLen
-    
+            #Don't start counting from num whose precedessor is
+            #present and with which we can build longer sequence
+            if num - 1 not in numSet:
+                current = num
+
+                #Increment current end of sequence
+                while current + 1 in numSet:
+                    current += 1
+
+                #+1 because we also count start num of seq
+                longest = max(longest, current - num + 1)
+
+        return longest
+        

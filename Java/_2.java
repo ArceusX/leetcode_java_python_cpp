@@ -1,5 +1,4 @@
 /**
- * Definition for singly-linked list.
  * public class ListNode {
  *     int val;
  *     ListNode next;
@@ -11,7 +10,7 @@
 class Solution {
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         int carry = 0;
-        var result = new ListNode(0);
+        var result = new ListNode(-1);
         var pointer = result;
         
         while ((l1 != null) || (l2 != null)) {
@@ -19,10 +18,9 @@ class Solution {
             int n2 = (l2 != null) ? l2.val : 0;
             
             int sum = carry + n1 + n2;
-            int sum_digit = sum % 10;
             carry = sum / 10;
             
-            pointer.next = new ListNode(sum_digit);
+            pointer.next = new ListNode(sum % 10);
             pointer = pointer.next;
             
             l1 = (l1 != null) ? l1.next : null;
