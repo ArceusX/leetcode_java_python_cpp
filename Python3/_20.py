@@ -1,22 +1,25 @@
 class Solution:
     def isValid(self, s: str) -> bool:
-        received = []
+        stack = []
 
         for char in s:
             if char in ['(', '{', '[']:
-                received.append(char)
+                stack.append(char)
             else:
-                if received:
-                    popped = received.pop()
+                if stack:
+                    popped = stack.pop()
+                    # Matched incorrectly
                     if ((popped == '(' and char != ')') or 
                        (popped == '[' and char != ']') or
                        (popped == '{' and char != '}')):
                         return False
 
-                    else:
-                        return False
+                # Not matched at all
+                else:
+                    return False
 
-        return not received or not s
+        # For True: either s is empty or all open-token properly closed
+        return not s or not stack
                 
 
         

@@ -1,49 +1,52 @@
 class Solution:
-    def strStr(self, haystack: str, needle: str) -> int:
+    def strStr(self, hay: str, needle: str) -> int:
         if not needle:
             return 0
-        elif len(needle) > len(haystack):
+        elif len(hay) < len(needle):
             return -1
 
-        j = 0
-        start = 0
-        current = 0
-        while (j < len(needle) and current < len(haystack)):
+        # Keep 2 points (start, end) for hay and 1 for needle
+        iNEnd = 0
+        iHStart = 0
+        iHEnd = 0
+        while (iNEnd < len(needle) and iHEnd < len(hay)):
 
-            #If find match, increment char in both strings
-            if needle[j] == haystack[current]:
-                current += 1
-                j += 1
+            # If find match, ++ current ends in both strings
+            if needle[iNEnd] == hay[iHEnd]:
+                iHEnd += 1
+                iNEnd += 1
 
-            # Reset found portion of needle and eliminate
-            # current "start" because it has been checked
+            # Reset needle to none found and ++ iHstart because
+            # we just checked starting from that in hay
             else:
-                j = 0
-                start += 1
-                current = start
+                iNEnd = 0
+                iHStart += 1
+                iHEnd = iHStart
 
-        #If found, get start index by subtracting len of needle from end index
-        if j == len(needle):
-            return (current - j)
+        # Finished checking needle (success) or hay (failure)
+        if iNEnd == len(needle):
+            return iHStart;
         else:
             return -1
 
 '''
+# List comprehension makes sliding window easier and quicker
 class Solution:
-    def strStr(self, haystack: str, needle: str) -> int:
+    def strStr(self, hay: str, needle: str) -> int:
 
         if not needle:
             return 0
-        elif len(needle) > len(haystack):
+        elif len(needle) > len(hay):
             return -1
 
-        needleLeng = len(needle)
+        needleLen = len(needle)
 
-        # After (len(haystack) - needleLength) char, what remains of haystack
-        # has smaller len than needleLen
-        for i in range(len(haystack) - needleLen + 1):
-            #Slide window. Use list comprehension
-            if haystack[i:i + needleLen] == needle:
+        # Consider only chars in hay that if is start, matching
+        # end dependent on needleLen remains within hay
+        for i in range(len(hay) - needleLen + 1):
+            # Slide window of length needleLen in hay
+            if hay[i:i + needleLen] == needle:
                 return i
+
         return -1
 '''

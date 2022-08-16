@@ -1,24 +1,23 @@
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
 class Solution {
 public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
         
-        if (lists.empty()) {
-            return nullptr;
+        if (lists.empty()) return nullptr;
+
+        // Merging linearly ([[0 + 1] + 2] + 3)
+        // is space-efficient, but time-inefficient
+
+        // Merging divide-and-conqurer ([0 + 1] + [2 + 3])
+        // is time-efficient, but space-inefficient
+
+        ListNode* merged = lists[0];
+        for (int i = 1; i < lists.size(); i++) {
+            merged = merge(merged, lists[i]);
         }
-        
-        return mergeLists(lists, 0, lists.size() - 1);
+        return merged;
+        //return mergeLists(lists, 0, lists.size() - 1);
     }
-    
+
     ListNode* mergeLists(vector<ListNode*>& lists, int start, int end) {
         
         if (start == end) {
@@ -48,19 +47,10 @@ public:
             
             tail = tail->next;
         }
+
+        if (left) tail->next = left;
+        if (right) tail->next = right;
         
-        while (left) {
-            tail->next = left;
-            left = left->next;
-            tail = tail->next; 
-        }
-
-        while (right) {
-            tail->next = right;
-            right = right->next;
-            tail = tail->next;
-        }
-
         return head->next;
     }
 };

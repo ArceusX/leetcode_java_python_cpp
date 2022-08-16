@@ -1,10 +1,10 @@
 """
-Algo: Maintain two nodes, fast and slow, with fast being n steps
-      ahead of slow. When fast reaches the end of the list,
-      where slow is then at will be n steps from end.
+Algo: Keep pointers fast and slow, incrementing fast n steps
+      ahead of slow. When fast reaches tail, slow will be
+      n steps behind tail and slow.next nth node from end.
+      Remove slow.next by rewiring slow.next = slow.next.next
 """
 
-# Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
 #         self.val = val
@@ -12,34 +12,27 @@ Algo: Maintain two nodes, fast and slow, with fast being n steps
 
 class Solution:
     def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
-
-        slow = head
-        fast = head
+        slow = fast = head
         
-        #After each iteration, i gives # of steps fast is ahead of slow
         for i in range(0, n):
-
-            if fast.next is None:
-
-                # (i == n - 1) implies we've reach tail, so end would be
-                # nth node, and thus, the node n steps before it is head
-
-                if i == n - 1:
-                    head = head.next
-
-                return head
-
             fast = fast.next
 
-        # Loop until fast node reaches to the end
-        # Now we will move both slow and fast pointers
-        while fast.next is not None:
+        # If fast reaches end before moving pointers together
+        # For list of length L, Lth node before end is head
+        # If reach end after ++ fast n times, nth node before
+        # end is head or head's predecessor
+        # To do: remove head, return head.next
+        # If head is sole node, removing node will return None
+        if not fast:
+            return head.next
+
+        # Loop until fast reaches tail, if it hasn't already
+        while fast.next:
             slow = slow.next
             fast = fast.next
 
-        #If slow is tail (ie n = 1), slow.next would be null
-        if slow.next is not None:
-            slow.next = slow.next.next
+        # Remove previous slow.next
+        slow.next = slow.next.next
 
         return head
         

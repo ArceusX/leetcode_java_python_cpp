@@ -1,69 +1,72 @@
-
 """
-Algo: We need access to predecessor to first node in
-      pack that will be swapped and successor to pack.
-      They are "start" and "end", respectively.
+Algo:
+For each pack, need access to predecessor to
+first node in pack to swap and succcessor to pack
 
-      Head itself will be swapped, so we need to create
-      dummy predecessor whose next points to head
+Head itself will be swapped, so create dummy
+predecessor whose next points to new head once swapped
+
+For reverse, place current tail before current head as pack
 """
-
 class Solution:
-    def reverseKGroup(self, head: ListNode, k: int) -> Optional[ListNode]:
+    def reverseKGroup(self, head: ListNode, k: int) -> ListNode:
 
-        #No node given or no swap requested
-        if head is None or k == 1:
+        # No node given or no swap requested
+        if not head or k == 1:
             return head
 
         dummy = ListNode(-1, head)
 
-        #Store precedessor's initial node val before it will be overwritten
-        predecessor = dummy
-        current = head
+        # Store initial predecessor before it will be overwritten
+        pred = dummy
+        tail = head
         count = 0
 
-        while current is not None:
+        while tail:
             count += 1
 
             # If count % k == 0:
-            # Arrive at last node of "pack" to reverse. We won't swap/rewire
-            # current.next, but we'll rewire next of new final node in
-            # pack (that was previously precedessor->current) to point 
-            # to current.next (pack's successor). Finally, make new current
-            # point to it to prepare for operation on next pack.
+            # Found final node of "pack", now reverse. tail.next
+            # won't be rewired but reqire new final node in pack
+            # initial pred->next/pack head) to point to tail.next 
+            # (pack's successor). Finally, move tail to successor,
+            # as first node of next pack
 
             if count % k == 0:
-                predecessor = self.reverseList(predecessor, current.next)
-                current = predecessor.next
+                pred = self.reverseList(pred, tail.next)
+                tail = pred.next
 
             else:
                 # Have not reached last node to swap in pack
-                current = current.next
+                tail = tail.next
 
         return dummy.next
 
     @staticmethod
-    def reverseList(start, end):
+    def reverseList(pred, end):
 
-        # Given list Start -> 1 -> 2 -> 3 -> ... -> End
-        # First swap involves 1 and 2 (precedessor and initial current)
-        # Store 3 as nextNode = current.next to set up next swap
-        # (current.next = start.next) and (start.next = current) wire
-        # such that 2 is now placed after S for S -> 2 -> 1 -> 3 -> ...
-        # As last step of iteration, proceed to 3.
-        # Next swap will place 3 after S for S -> 3 -> 2 -> 1 -> ...
+        # For pack pred -> 1 -> 2 -> 3 -> ... -> end
+        # Swap 1 (pred->next) and 2 (tail): store 3 as
+        # after = tail.next, place 2 before 1, go to 3
+        # Swap 2 and 3 (tail): store 4, place 3 before 2,
+        # go to 4. After swaps ifnished, 1 is new final
+        # node, wire 1 to point to end, return 1.
 
-        predecessor = start.next
-        current = predecessor.next
+        head = pred.next
+        tail = head.next
 
-        while current is not end:
-            nextNode = current.next
-            current.next = start.next
-            start.next = current
-            current = nextNode
+        while tail is not end:
+            # Store after as successor to later node to swap
+            after = tail.next
 
-        # After swap iterations, wire new final node of pack 1 -> E
+            # Wire tail to point to current head of pack
+            tail.next = pred.next
+            pred.next = tail
+            tail = after
+
+        # After swaps, wire new final node of pack (its
+        # prev head) as 1 -> end (first node of next pack)
         # Return 1 as precedessor to next pack
-        predecessor.next = end
-        return predecessor
+        head.next = end
+        return head
         

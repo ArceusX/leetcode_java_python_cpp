@@ -1,19 +1,18 @@
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
               
-        # We increment this when we scan a new unique int,
-        # for which we overrite that index in nums
+        # Two pts: nUnique to write to (then ++) and i to read from
         nUnique = 0
 
         for i in range(len(nums) - 1):
-            #For all except last elem, compare elem to its successor
-            #If same value, leave it to successor elem to process unique number
+            # Except for last elem, if elem has same val as
+            # successor, leave it to successor to process unique num
             if nums[i] != nums[i + 1]:
                 nums[nUnique] = nums[i]
                 nUnique += 1
 
-        #If last elem is non-unique, its predecessors would have left responsibility
-        #to it. Either way, it is processed as unique here.
+        # If last elem is non-unique, its predecessor would have 
+        # left task to it. Either way, process it as unique here
         if len(nums) > 0:
             nums[nUnique] = nums[-1]
             nUnique += 1
