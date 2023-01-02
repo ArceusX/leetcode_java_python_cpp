@@ -39,16 +39,26 @@ class Solution:
 
 # edge is (weight[0], toNode[1]). Weight from added node to nbor toNode
 class MinHeap:
+
+    # If passed [] or nothing for arr, no push 
     def __init__(self, arr = []):
-        self.heap = []
-        for edge in arr:
-            self.push(edge)
+
+        # Heapify in-place all at once
+        self.heap = arr
+        self.heapifyDown(self.heap)
+
+        # Push, then heapify one-by-one
+        # self.heap = []
+        # for edge in arr:
+        #     self.push(edge)
                 
     def push(self, edge) -> None:
         self.heap.append(edge)
         self.heapifyUp(self.heap, len(self.heap) - 1)
         
-    # When single elem violates heap property. Modify only its ancestors
+    # heapifyUp swaps only if child < parent and other child 
+    # doesn't mind if parent is swap to have smaller val (need
+    # to check and modify only 1 branch when percolating)
     @staticmethod
     def heapifyUp(arr, i) -> None:
         if not (0 <= i < len(arr)): return
@@ -56,57 +66,64 @@ class MinHeap:
         child = i
         parent = (child - 1) // 2
         
-        # Percolate up, swapping to ensure smaller val is made parent
+        # Percolate up, swapping to ensure smaller between child
+        # and parent is made new parent for MinHeap
         while child != 0 and arr[child][0] < arr[parent][0]:
             arr[child], arr[parent] = arr[parent], arr[child]
             child = parent
             parent = (child - 1) // 2
           
     # Array's tail is efficiently removed in O(1). Other indices need
-    # O(n) shifts. Swap root val we want to remove with tail's val,
-    # remove tail, then heapifyDown along single branch from root
+    # O(n) shifts. Swap root val we want to remove with tail val,
+    # remove tail, then heapifyDown from root
     def pop(self) -> (int, int):
         if self.heap:
             self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
             prevRoot = self.heap.pop()
-            self.heapifyDown(self.heap, 0)
+            self.heapifyDown(self.heap)
             return prevRoot
         
-        return None
-    
+        return
+
+    # Assume "default" i = 0 because pop attempts to erase arr[0]
+    # For updateKey, i is variable because any node is targetable
     @staticmethod
-    def heapifyDown(arr, i) -> None:
+    def heapifyDown(arr, i = 0) -> None:
         n = len(arr)
 
-        # n - 1: Nothing below to possibly swap with if last node
+        # arr[-1]: No child to swap with if is leaf, which final node is
         if not (0 <= i < n - 1): return
         
-        # If need to swap parent, swap it with lower val child as
-        # higher val child expects new parent val to become smaller
-        # That leaves subtree of higher val child unperturbed
+        # When swapping parent, swap it with lower-val child so
+        # parent now with smaller child's val will still be less than
+        # larger child. Subtree of larger child left unaffected
         
         parent = i
-        lValChild = 2 * parent + 1
+        child = 2 * parent + 1 # leftChild
         
-        while lValChild < n:
-            if (lValChild < n - 1) and arr[lValChild + 1][0] < arr[lValChild][0]:
-                lValChild += 1
+        while child < n:
+
+            # Set child to lower-val child. Check rightChild exist first
+            if (child < n - 1) and arr[child + 1][0] < arr[child][0]:
+                child += 1
                 
-            if arr[lValChild][0] < arr[parent][0]:
-                arr[parent], arr[lValChild] = arr[lValChild], arr[parent]
+            if arr[child][0] < arr[parent][0]:
+                arr[parent], arr[child] = arr[child], arr[parent]
+
+            # If swap is unneeded, no longer need to heapifyDown subtree
             else:
                 break
                 
-            parent = lValChild
-            lValChild = 2 * parent + 1
+            parent = child
+            child = 2 * parent + 1
         
-    #Unused
+    # Get highest-priority elem: max | min elem for (Max | Min) Heap
     def peek(self) -> (int, int):
         if not self.heap:
             return
         return self.heap[0]
     
-    #Unused
+    # Unused
     def updateKey(self, i, newVal) -> None:
         if not (0 <= i < len(self.heap)):
             return
@@ -114,10 +131,10 @@ class MinHeap:
         prevVal = self.heap[i][0]
         self.heap[i][0] = newVal
         
-        # If updated with larger val, percolate change+= down to leaves
+        # If updated with larger val, percolate change+ down to leaves
         if newVal > prevVal:
             MinHeap.heapifyDown(self.heap, i)
             
-        # If replaced with smaller val, percolate change-= up to root
+        # If updated with smaller val, percolate change- up to root
         else:
             MinHeap.heapifyUp(self.heap, i) 
