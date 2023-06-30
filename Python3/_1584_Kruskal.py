@@ -1,60 +1,54 @@
-# Kruskal's Algo, using disjoint union set to check if potential
-# edge connects components not already connected.
+# 1584 Min Cost to Connect All Points (Kruskal's Algo)
 
-# Unlike Prim's, Kruskal's does not build out from 1 central
-# connected component, but rather from multiple (each node
-# node initial placed in its own component) that are then
-# finally merged into 1 central component
-# ie No global "root", only local ones, until final iteration
+# Kruskal
+# Join components not already joined via min-weight edge
+# Prim adds nodes to single connected component directly
+# Kruskal instead adds nodes by merging n components
+# (each node initially put in its own) until 1 remains
 
 class Solution:
     def minCostConnectPoints(self, points: List[List[int]]) -> int:
         n = len(points)
         
+        # Disjoint union set 
         parent = [x for x in range(n)]
-        
-        # Return root and height of path to root
-        # Not global rank, but rather local based on 1 path
+        # Re: root of set holding x and height of path to that root
+        # Height lets identify larger set to join other set to
         def find(x: int) -> (int, int):
             height = 1
-            while parent[x] != x:
-
-         		# Wire x to point to its grandparent, which may
-         		# be identical to parent. Then move x up branch
+            while parent[x] != x: # If !points to itself, is !root
+                # Point x to its GP to shorten path
                 x, parent[x] = parent[x], parent[parent[x]]
                 height += 1
             
             return (x, height)
         
+        # Sort by distance from every node to every other
         edges = []
-        
-        # Calculate Manhattan distance from every node to every other
         for outNode in range(n):
             for inNode in range(outNode + 1, n):
                 weight = abs(points[outNode][0] - points[inNode][0]) +\
                          abs(points[outNode][1] - points[inNode][1])
                 edges.append((weight, outNode, inNode))
-                
         edges.sort()
         
-        # For minimun spanning tree, V = E + 1
-        nInMST = 0
+        # .. =  1: Self-edge initializes each set with 1 node 
+        nInMST  = 1
         sumCost = 0
         
         for (weight, outNode, inNode) in edges:
             outFind = find(outNode)
-            inFind = find(inNode)
+            inFind  = find(inNode)
 
-            if (outFind[0] != inFind[0]):
+            if (outFind[0] != inFind[0]): # Join sets not joined
                 sumCost += weight
-                nInMST += 1
+                nInMST  += 1
                 
-                if nInMST == n - 1:
-                    break
+                if nInMST == n: break
                 
-                # Wire root of shorter height to root of longer
-                # (using rank or longest height over any path would 
-                # be improved, costlier alternative)
+                # Root of shorter height to point to longer root
+                # To use rank or longest height over any path 
+                # would be improved, costlier alternative
                 if (outFind[1] > inFind[1]):
                     parent[inFind[0]] = outFind[0]
                 else:

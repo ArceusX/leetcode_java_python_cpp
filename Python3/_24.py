@@ -1,33 +1,57 @@
-"""
-Algo: 
-Track 3 nodes: ones to swap and predecessor of
-1st node for which to set "precedessor.next = second"
+# 024: Swap Nodes in Pairs
 
-Head lacks predecessor, so create one for it so
-operation on head emulates that on every other node
-"""
-
+# Sol 1
+# If nodes' val can be swapped, swap vals rather than rewire next ptrs
 class Solution:
-    def swapPairs(self, head: ListNode) -> ListNode:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
 
-        pred = ListNode(-1, head)
+        if not head or not head.next:
+            return head
 
-        # Store initial pred(ecessor) before it's overwritten
-        dummy = pred
+        back = head
+        lead = back.next
 
-        # If last node is "odd" indexed, it is not swapped
-        while pred.next and pred.next.next:
+        while lead:
+            back.val, lead.val = lead.val, back.val
 
-            first = pred.next
-            second = pred.next.next
-            
-            # Wire 1 to point to 2's next, [then] 2 to 1
-            pred.next = second
-            first.next = second.next
-            second.next = first
+            # Next pair: shift back 2, set lead to node after back 
+            back = lead.next
+            lead = back.next if back else None
 
-            # Increment pred to first of next pair
-            pred = pred.next.next
+        return head
 
-        return dummy.next
-        
+
+# Sol 2: Under restriction only next ptrs, and not vals, can change
+# Track 3 nodes: pred(ecessor) whose next rewiring; back: rewire its
+# next to point to lead.next; lead: follows back before swap
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+
+        if not head or not head.next:
+            return head
+
+        falseHead = ListNode(-1, head)
+        pred      = falseHead
+        back      = head
+        lead      = back.next
+
+        while lead:
+            # lead replaces back as node pointed to by pred
+            pred.next = lead
+
+            # Set back to point to 1st node in next pair (before swap)
+            back.next = lead.next
+
+            # before: back -> lead. now: lead -> back
+            lead.next = back
+
+            # pred for next iter: back because back took lead's place
+            pred = back
+
+            # After rewire, now move back to 1st node in next pair
+            back = back.next
+
+            # Move lead to back's successor to ready for next iter
+            lead = back.next if back else None
+
+        return falseHead.next

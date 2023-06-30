@@ -1,5 +1,6 @@
+# Hard: Unmastered. Uses dynamic programming
+
 """
-Problem :
 . = matches any single char
 * = matches zero or more of (guaranteed existing) preceding char
 
@@ -9,7 +10,7 @@ Algo    : Calculate result as result of earlier checks (memoized in
           table) and current chars check. Return highest-indices
           entry of table as result over full text and full pattern.
 
-Complex.
+Complexity
 Time    : O(lenT * lenP) for text T, pattern p
 
           Iterate over each char of pattern p and check if it matches

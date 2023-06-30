@@ -4,11 +4,14 @@ class Solution:
         
         while (low < high):
             sum_ = nums[low] + nums[high]
+            
             if sum_ == target:
-
-            	#nums given as range 1 to n
+            	# indices given as range 1 to n (1-indexed)
                 return [low + 1, high + 1]
                 
+            # Case: Invalidate nums[high] as candidate because
+            # its sum with lowest still-viable candidate still 
+            # exceeds target
             elif sum_ > target:
                 high -= 1
             else:

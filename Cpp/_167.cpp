@@ -5,6 +5,7 @@ public:
 
         while (low < high) {
             int sum = nums[low] + nums[high];
+
             if (sum == target)
                 return vector<int> {low + 1, high + 1};
             else if (sum > target)
@@ -12,6 +13,7 @@ public:
             else
                 low++;
         }
+        
         return vector<int> {-1, -1};
     }
 };

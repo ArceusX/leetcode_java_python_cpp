@@ -2,28 +2,30 @@ class Solution {
 public:
 ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
 
-	// Create 2 pointers: 1 we merge elems into and 
-	// another that tracks eventual head of merged list
-	ListNode* mDummy = new ListNode(-1);
-	ListNode* mPt = mDummy;
+	ListNode *curr1 = l1, *curr2 = l2;
 
-    while (l1 && l2) {
-	    if (l1->val < l2->val) {
-	    	mPt->next = l1;
-	    	l1 = l1->next;
+	// Create 2 ptrs: tail onto which nodes merge, 
+	// falseHead that points to eventual head of merged
+	ListNode* tail      = new ListNode(-1);
+	ListNode* falseHead = tail;
+
+    while (curr1 && curr2) {
+	    if (curr1->val < curr2->val) {
+	    	tail->next = curr1;
+	    	curr1 = curr1->next;
 	    }
 	    else {
-	    	mPt->next = l2;
-	    	l2 = l2->next;
+	    	tail->next = curr2;
+	    	curr2 = curr2->next;
 	    }
-	    mPt = mPt->next;
+	    tail = tail->next;
     }
 
-    // No more merge involving elems from different
-    // list, so quickly add elems of remaining list
-    if (l1) mPt->next = l1;
-    if (l2) mPt->next = l2;
+    // After either list depleted: end comparison, 
+    // if other remains, merge its current tracked 
+    if (curr1) tail->next = curr1;
+    if (curr2) tail->next = curr2;
 
-    return mDummy->next;
+    return falseHead->next;
 }
 };

@@ -1,65 +1,36 @@
-"""
-Algo: 
-Allot remaining lists (initially all: 0 to len(lists) - 1)
-to scan between two merge tasks, which will allot between 
-their own sub-tasks, until a task needs to merge only two lists. 
+# Class that wraps ListNode and defines comparison for heapq use
+class ComparableNode:
+    def __init__(self, node):
+        self.node = node
 
-Indices (start, end) track each lists are alloted to each task.
-"""
+    def __lt__(self, other):
+        return self.node.val < other.node.val
 
 class Solution:
-    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
 
-        if not lists:
+        merged = falseHead = ListNode(-1)
+
+        # if node: Consider only non-None nodes
+        leaders = [ComparableNode(node) for node in lists if node]
+
+        # If no non-None node in lists, there is nothing to merge
+        if not leaders:
             return None
 
-        return self.mergeLists(lists, 0, len(lists) - 1)
+        # With heap, get least among current traversed node of each list 
+        heapq.heapify(leaders)
 
-    def mergeLists(self, lists, start, end):
+        while len(leaders) > 1: # while comparison is still needed
+            least       = heapq.heappop(leaders)
+            merged.next = least.node
+            merged      = merged.next
 
-        # Only one list remains for task, so no need to merge
-        if start == end:
-            return lists[start]
+            # Upon adding least to merged, shift to next of that least
+            if least.node.next:
+                heapq.heappush(leaders, \
+                ComparableNode(least.node.next))
 
-        # Allot lists between two merge tasks, which
-        # will further allot until an task is alloted
-        # only two lists whose entries it can sort by "riffle shuffle"
+        merged.next = heapq.heappop(leaders).node # Add remaining list
 
-        mid = (start + end) // 2
-
-        left = self.mergeLists(lists, start, mid)
-        right = self.mergeLists(lists, mid + 1, end)
-
-        return self.merge(left, right)
-
-    @staticmethod
-    def merge(left, right):
-
-        # Dummy node whose next points to would-be smallest of merged list
-        head = ListNode(-1)
-        tail = head
-
-        while left and right:
-
-            #Append smaller val node to tail, then shift along list of appended node
-            if left.val < right.val:
-                tail.next = left
-                left = left.next
-
-            else:
-                tail.next = right
-                right = right.next
-
-            #Shift tail along for next append
-            tail = tail.next
-
-        # Append remaining of one or no remaining list
-        if left:
-            tail.next = left
-
-        if right:
-            tail.next = right
-
-
-        return head.next
-        
+        return falseHead.next

@@ -1,74 +1,72 @@
-# Kruskal's Algo, using disjoint union set to check if potential
-# edge connects components not already connected.
+# 1584 Min Cost to Connect All Points (Kruskal's Algo)
+# Implement own MinHeap class
 
-# Implementing own MinHeap class
+# Use heap to get min-weight edge. Use disjoint union set to
+# check if that edge joins components not already joined
 
 class Solution:
     def minCostConnectPoints(self, points: List[List[int]]) -> int:
         n = len(points)
         
+        # Disjoint union set 
         parent = [x for x in range(n)]
-        
-        # Return root and height of path to root
-        # Not global rank, but rather local based on 1 path
+        # Re: root of set holding x and height of path to that root
+        # Height lets identify larger set to join other set to
         def find(x: int) -> (int, int):
             height = 1
-            while parent[x] != x:
-
-                # Wire x to point to its grandparent, which may
-                # be identical to parent. Then move x up branch
+            while parent[x] != x: # If !points to itself, is !root
+                # Point x to its GP to shorten path
                 x, parent[x] = parent[x], parent[parent[x]]
                 height += 1
             
             return (x, height)
         
+        # Heap to sort by distance from every node to every other
         heap = MinHeap()
-        
-        # Calculate Manhattan distance from every node to every other
         for outNode in range(n):
             for inNode in range(outNode + 1, n):
                 weight = abs(points[outNode][0] - points[inNode][0]) +\
                          abs(points[outNode][1] - points[inNode][1])
                 heap.push((weight, outNode, inNode))
                 
-        
-        # We didn't add "edge" of weight 0 from any node to itself
-        # to heap, so "starting" node comes free
-        # Alternative, set nEdgesAdded = 0...while nEdgesAdded < n -1
-        nInMST = 1
+        # .. =  1: Self-edge initializes each set with 1 node 
+        nInMST  = 1
         sumCost = 0
         
+        # To iterate over edges gives no guarantee each
+        # iteration adds 1 node to connected component
         while nInMST < n:
             (weight, outNode, inNode) = heap.pop()
             outFind = find(outNode)
-            inFind = find(inNode)
+            inFind  = find(inNode)
 
-            if (outFind[0] != inFind[0]):
+            if (outFind[0] != inFind[0]): # Join sets not joined
                 sumCost += weight
-                nInMST += 1
+                nInMST  += 1
                 
-                # Wire root of shorter height to root of longer
-                # (using rank or longest height over any path would 
-                # be improved, costlier alternative)
+                # Root of shorter height to point to longer root
+                # To use rank or longest height over any path 
+                # would be improved, costlier alternative
                 if (outFind[1] > inFind[1]):
-                    parent[inFind[0]] = outFind[0]
+                    parent[inFind[0]]  = outFind[0]
                 else:
                     parent[outFind[0]] = inFind[0]
                     
         return sumCost
 
-# edge is (weight[0], fromNode[1], toNode[2])
+# edge: (0: weight, 1: fromNode, 2: toNode)
 class MinHeap:
     def __init__(self, arr = []):
-        self.heap = []
-        for edge in arr:
-            self.push(edge)
+        self.heap = arr[:] # Copy
+        for i in range(1, len(self.heap)):
+            MinHeap.heapifyUp(self.heap, i)
                 
-    def push(self, edge) -> None:
+    def push(self, edge) -> None: # Keep heapness
         self.heap.append(edge)
         self.heapifyUp(self.heap, len(self.heap) - 1)
         
-    # When single elem violates heap property. Modify only its ancestors
+    # Ensure heapness up from lone index i of arr, default
+    # being arr's final index for call by push()
     @staticmethod
     def heapifyUp(arr, i) -> None:
         if not (0 <= i < len(arr)): return
@@ -76,69 +74,63 @@ class MinHeap:
         child = i
         parent = (child - 1) // 2
         
-        # Percolate up, swapping to ensure smaller val is made parent
+        # Resolve up: Swap to set lower-ordered val as parent 
+        # Child's sibling accepts parent swapped lower-ordered val
         while child != 0 and arr[child][0] < arr[parent][0]:
             arr[child], arr[parent] = arr[parent], arr[child]
             child = parent
             parent = (child - 1) // 2
           
-    # Array's tail is efficiently removed in O(1). Other indices need
-    # O(n) shifts. Swap root val we want to remove with tail's val,
-    # remove tail, then heapifyDown along single branch from root
+    # Algo: Swap vals at [0] and [-1]. In O(1), remove
+    #       val now at [-1]. heapifyDown(..) from [0]
     def pop(self) -> (int, int, int):
-        if self.heap:
+        if  self.heap:
             self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
             prevRoot = self.heap.pop()
-            self.heapifyDown(self.heap, 0)
+            self.heapifyDown(self.heap)
             return prevRoot
         
         return None
-    
+
+    # Ensure heapness down from lone index i of arr, default
+    # being i = 0 for call by pop(),
     @staticmethod
-    def heapifyDown(arr, i) -> None:
+    def heapifyDown(arr, i = 0) -> None:
         n = len(arr)
 
-        # n - 1: Nothing below to possibly swap with if last node
+        # arr[-1]: As leaf, has no child to swap with
         if not (0 <= i < n - 1): return
         
-        # If need to swap parent, swap it with lower val child as
-        # higher val child expects new parent val to become smaller
-        # That leaves subtree of higher val child unperturbed
-        
         parent = i
-        lValChild = 2 * parent + 1
+        child = 2 * parent + 1 # leftChild
         
-        while lValChild < n:
-            if (lValChild < n - 1) and arr[lValChild + 1][0] < arr[lValChild][0]:
-                lValChild += 1
+        # Child's sibling accepts parent swapped lower-ordered val
+        while child < n:
+
+            # Set child to lower-val child between left and right
+            if (child < n - 1) and arr[child + 1][0] < arr[child][0]:
+                child += 1
                 
-            if arr[lValChild][0] < arr[parent][0]:
-                arr[parent], arr[lValChild] = arr[lValChild], arr[parent]
+            if arr[child][0] < arr[parent][0]:
+                arr[parent], arr[child] = arr[child], arr[parent]
+
+            # If no swap, no longer need to heapifyDown subtree
             else:
                 break
                 
-            parent = lValChild
-            lValChild = 2 * parent + 1
+            parent = child
+            child = 2 * parent + 1
+      
+    # Unused. Set heap[i] = newVal, restore heapness
+    def setKey(self, i, newVal) -> None:
+        if not (0 <= i < len(self.heap)): return
         
-    #Unused
-    def peek(self) -> (int, int):
-        if not self.heap:
-            return
-        return self.heap[0]
-    
-    #Unused
-    def updateKey(self, i, newVal) -> None:
-        if not (0 <= i < len(self.heap)):
-            return
-        
-        prevVal = self.heap[i][0]
+        preVal = self.heap[i][0]
         self.heap[i][0] = newVal
         
-        # If updated with larger val, percolate change+= down to leaves
-        if newVal > prevVal:
+        # Push change+ down to leaves
+        if newVal > preVal:
             MinHeap.heapifyDown(self.heap, i)
             
-        # If replaced with smaller val, percolate change-= up to root
-        else:
+        else: # Push change- up to root
             MinHeap.heapifyUp(self.heap, i) 
-    

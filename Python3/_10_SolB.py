@@ -1,4 +1,8 @@
+# Hard: Unmastered. Dynamic programming
+# O(lenT * lenP) time, O(lenT) space. 
+
 class Solution(object):
+    # t: corpus text, p: search pattern
     def isMatch(self, t: str, p: str) -> bool:
 
         lenT, lenP = (len(t), len(p))

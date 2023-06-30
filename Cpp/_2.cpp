@@ -1,18 +1,14 @@
-/**
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+// 002: Add Two Numbers (Digits Being Nodes in Linked List)
+
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         int carry = 0;
-        auto result = new ListNode(0);
-        auto pointer = result;
+
+        // falseHead: Base holding result digits, but to
+        //            be excluded from result
+        auto falseHead = new ListNode(-1);
+        auto current = falseHead;
         
         while (l1 || l2) {
             
@@ -20,17 +16,18 @@ public:
             int sum_digit = sum % 10;
             carry = sum / 10;
             
-            pointer->next = new ListNode(sum_digit);
-            pointer = pointer->next;
+            // Add latest result digit (exclude carry)
+            current->next = new ListNode(sum_digit);
+            current = current->next;
             
             l1 = l1 ? l1->next : nullptr;
             l2 = l2 ? l2->next : nullptr;
         }
         
         if (carry != 0) {
-            pointer->next = new ListNode(carry);
+            current->next = new ListNode(carry);
         }
         
-        return result->next;
+        return falseHead->next;
     }
 };

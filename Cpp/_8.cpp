@@ -1,34 +1,38 @@
+// 008: Convert string to int
+// Skip leading whitespace; read -|+ if present; loop until char
+// not convertible to digit: if appending digit would put result 
+// out of bound, return bound, else append. Prepend - if found
+
 class Solution {
 public:
     int myAtoi(string s) {
-        
-        if (s.empty()) return 0;
 
         int i = 0;
+        while (isspace(s[i])) i++;
 
-        // Automatically check we don't go out of bounds
-        while (s[i] == ' ') i++;
-        
-        int sign = 1;
-        
+        bool isNegative = false;
         if (s[i] == '-' || s[i] == '+') {
-            if (s[i] == '-') sign = -1;
+            isNegative = (s[i] == '-');
             i++;
         }
-        
-        int num = 0;
-       
-        while (s[i] >= '0' && s[i] <= '9') {
-            // 7 because INT_MAX % 10 == 7
-            // str(-2**31) satisfies .. s[c] > '7' and return -2**31
-            if ((num > INT_MAX / 10) || 
-               (num == INT_MAX / 10 && s[i] - '0' > 7)) {
-                return sign == 1 ? INT_MAX : INT_MIN;
+
+        int ret = 0;
+        for (int sLen = s.size(); i < sLen; i++) {
+            char c = s[i];
+            if (!isdigit(c)) break;
+
+            int digit = c - '0';
+
+            // 7 because INT_MAX % 10 == 7. Either by this or by
+            // normal end return , str(INT_MIN) returns INT_MIN
+            if  (ret  > INT_MAX/10 || 
+                (ret == INT_MAX/10 && digit > 7)) {
+                return isNegative ? INT_MIN : INT_MAX;
             }
- 
-            num = num * 10 + (s[i] - '0');
-            i++;
-       }   
-       return sign * num;
+
+            ret = 10 * ret + digit;
+        }
+
+        return isNegative ? -ret : ret;
     }
 };

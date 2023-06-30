@@ -1,38 +1,39 @@
+// 003: Longest Substring Without Repeating Characters
 /*
-For previously unseen char, store its index in dict,
-    calculate length from "start" to it, and get higher
-    between that length and maxLen. If recounter char,
-    move start to index after previous index of duplicate
-    [if] that previous index follows current start.
-    Exclude from sequence last previous copy of duplicate
-    char and any char preceding that previous copy.
-    For each char, eval longest sequence containing it
+ * Target substr must not repeat any char c. For each c,
+ * if c is in prevSeen, exclude c and any char preceding
+ * c (ie lowBound = max(lowBound, prevSeen[c] + 1)) 
+ * Compare len(target) to running maxSublen
 
-[a+b+c+d+e]         -> Eval [abcd(e)]
-[a+b+c+d+e] + c     -> Eval [de(c)]
-[a+b+c+d+e] + c + b -> Eval [dec(b)]
-*/
+ * a, b, c, d*, c , b  -> Check [abcd]. lowBound == a
+ * a, b, c, d , c*, b  -> Check [dc  ]. lowBound == d
+ * a, b, c, d , c , b* -> Check [dcb ]. lowBound == d */
 
 class Solution {
     public int lengthOfLongestSubstring(String s) {
-        Map<Character, Integer> chars = new HashMap<>();
-        int maxLen = 0;
-        int start = 0;
+        Map<Character, Integer> prevSeen = new HashMap<>();
 
-        for (int end = 0; end < s.length(); end++) {
-            char c = s.charAt(end);
+        // maxStart: extraneous for this problem, but need
+        // for related problem to return longest substr
+        int lowBound = 0, maxSublen = 0, maxStart = 0;
 
-            Integer prev = chars.get(c);
+        for (int i = 0, sLen = s.length(); i < sLen; i++) {
+
+            Integer prev = prevSeen.get(s.charAt(i));
             if (prev != null) {
-                start = Math.max(prev + 1, start);
+                lowBound = Math.max(lowBound, prev + 1);
             }
             
-            maxLen = Math.max(maxLen, end - start + 1);
+            int len = i - lowBound + 1;
+            if (len > maxSublen) {
+                maxSublen = len;
 
-            // Set last previous copy of char for potential next
-            chars.put(c, end);
+                // Extraneous for this specific problem
+                if (prev != null) maxStart = prev + 1;
+            }
+            prevSeen.put(s.charAt(i), i);
         }
-        
-        return maxLen;
+
+        return maxSublen;
     }
 }

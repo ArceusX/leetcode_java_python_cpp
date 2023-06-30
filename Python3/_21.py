@@ -1,19 +1,26 @@
 class Solution:
-    def mergeTwoLists(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    def mergeTwoLists(self, curr1: Optional[ListNode], curr2: Optional[ListNode]) -> Optional[ListNode]:
         
-        tail = head = ListNode(-1)
+        curr1, curr2 = l1, l2
 
-        while (l1 and l2):
-        	if (l1.val < l2.val):
-        		tail.next = l1
-        		l1 = l1.next
+        # Create 2 ptrs: tail onto which nodes merge, 
+        # falseHead that points to eventual head of merged
+        tail = falseHead = ListNode(-1)
+
+        while curr1 and curr2:
+        	if  curr1.val < curr2.val:
+        		tail.next = curr1
+        		curr1 = curr1.next
+
         	else:
-        		tail.next = l2
-        		l2 = l2.next
+        		tail.next = curr2
+        		curr2 = curr2.next
 
         	tail = tail.next
 
-        if l1: tail.next = l1
-        if l2: tail.next = l2
+        # After either list depleted: end comparison, 
+        # other remains, merge its current tracked 
+        if curr1: tail.next = curr1
+        if curr2: tail.next = curr2
 
-        return head.next
+        return falseHead.next

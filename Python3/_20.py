@@ -1,25 +1,25 @@
 class Solution:
     def isValid(self, s: str) -> bool:
-        stack = []
+        toClose = []
 
         for char in s:
             if char in ['(', '{', '[']:
-                stack.append(char)
-            else:
-                if stack:
-                    popped = stack.pop()
-                    # Matched incorrectly
-                    if ((popped == '(' and char != ')') or 
-                       (popped == '[' and char != ']') or
-                       (popped == '{' and char != '}')):
-                        return False
-
-                # Not matched at all
-                else:
+                toClose.append(char)
+                continue
+                
+            if toClose:
+                popped = toClose.pop()
+                # Matched incorrectly: invalid
+                if ((popped == '(' and char != ')') or 
+                    (popped == '[' and char != ']') or
+                    (popped == '{' and char != '}')):
                     return False
 
-        # For True: either s is empty or all open-token properly closed
-        return not s or not stack
+            else: # Close-token left hanging: invalid
+                return False
+
+        # Check all found open-tokens are closed
+        return not toClose
                 
 
         

@@ -1,3 +1,5 @@
+// Hard: Unmastered. Uses dynamic programming
+
 class Solution {
     public boolean isMatch(String t, String p) {
 

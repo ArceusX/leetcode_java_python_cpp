@@ -1,3 +1,5 @@
+// 1584 Min Cost to Connect All Points (Prim's Algo)
+
 class Solution {
 public:
 	using Edge = pair<int, int>;
